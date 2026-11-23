@@ -24,6 +24,7 @@ export function TrailerModal({
   subtitles = [],
 }: TrailerModalProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [videoError, setVideoError] = useState(false);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -80,27 +81,39 @@ export function TrailerModal({
             </div>
 
             <div className="relative aspect-video w-full bg-black">
-              <video
-                src={videoUrl}
-                poster={posterUrl}
-                controls
-                autoPlay
-                playsInline
-                crossOrigin="anonymous"
-                className="h-full w-full"
-              >
-                {subtitles.map((track) => (
-                  <track
-                    key={track.srcLang}
-                    kind="subtitles"
-                    src={track.src}
-                    srcLang={track.srcLang}
-                    label={track.label}
-                    default={track.default}
-                  />
-                ))}
-                O teu navegador não suporta a reprodução de vídeo HTML5.
-              </video>
+              {videoError ? (
+                <div className="flex h-full w-full flex-col items-center justify-center gap-2 p-6 text-center text-sm text-zinc-400">
+                  <p className="font-semibold text-zinc-200">
+                    Não foi possível carregar o vídeo.
+                  </p>
+                  <p className="text-xs text-zinc-500">
+                    Verifica a tua ligação ou tenta novamente mais tarde.
+                  </p>
+                </div>
+              ) : (
+                <video
+                  src={videoUrl}
+                  poster={posterUrl}
+                  controls
+                  autoPlay
+                  playsInline
+                  {...(subtitles.length > 0 ? { crossOrigin: "anonymous" } : {})}
+                  onError={() => setVideoError(true)}
+                  className="h-full w-full"
+                >
+                  {subtitles.map((track) => (
+                    <track
+                      key={track.srcLang}
+                      kind="subtitles"
+                      src={track.src}
+                      srcLang={track.srcLang}
+                      label={track.label}
+                      default={track.default}
+                    />
+                  ))}
+                  O teu navegador não suporta a reprodução de vídeo HTML5.
+                </video>
+              )}
             </div>
           </div>
         </div>
